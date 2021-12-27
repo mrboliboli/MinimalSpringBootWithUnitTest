@@ -2,8 +2,6 @@ package fr.fab.test.dto;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +20,6 @@ public class PaysDto {
     @NonNull
     private String langue;
     @NonNull
-    @JsonManagedReference
     private List<VilleDto> villes;
 
 }

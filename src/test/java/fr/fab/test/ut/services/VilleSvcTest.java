@@ -1,7 +1,9 @@
-package fr.fab.test.ut;
+package fr.fab.test.ut.services;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,9 +40,9 @@ import fr.fab.test.services.VilleSvcImpl;
  * https://blog.devgenius.io/spring-boot-deep-dive-on-unit-testing-92bbdf549594#1c9b
  */
 @SpringBootTest
-@TestInstance(Lifecycle.PER_CLASS)
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT) // on demande a mokito le silence pour le dernier test
+@TestInstance(Lifecycle.PER_CLASS) // indique que l'instance de test est commune a toutes les methodes de la classe
+@ExtendWith(MockitoExtension.class) // pour l'utilisation de mockito
+@MockitoSettings(strictness = Strictness.LENIENT) // on demande a mokito le silence pour le dernier test voir explication plus bas
 public class VilleSvcTest {
 
     /**
@@ -63,7 +65,6 @@ public class VilleSvcTest {
     @BeforeAll 
 	public void init() {
 		MockitoAnnotations.openMocks(this);
-
 	}
 
 
@@ -82,7 +83,7 @@ public class VilleSvcTest {
         List<VilleDto> villes = villeSvc.list().stream().sorted(Comparator.comparingLong(VilleDto::getId)).collect(Collectors.toList());
 
         //les Assertions
-        assertEquals(villes.size(), 3);
+        assertEquals(3, villes.size());
         /**
          * https://www.baeldung.com/mockito-verify
          */
@@ -90,6 +91,7 @@ public class VilleSvcTest {
         assertEquals("poo", villes.get(0).getNom());
 
     }
+    
     @Test
     void getVillesById_toDto(){
         Pays pooLand = new Pays(1l, "pooLand", "pl", new HashSet<>());
@@ -99,17 +101,23 @@ public class VilleSvcTest {
         assertNotNull(ville);
         assertEquals("poo", ville.getNom());
     }
+
     @Test
     void CreateVilles_fromDto_toDto(){
         
         Pays pooLand = new Pays(1l, "pooLand", "pl", new HashSet<>());
         Ville villeOut = new Ville(1l,"poo", pooLand);
-        Ville villeIn = new Ville(0l,"poo", pooLand);
         pooLand.getVilles().add(villeOut);
         when(paysRepository.getById(1l)).thenReturn(pooLand);
-        when(villeRepository.save(villeIn)).thenReturn(villeOut);
-        // comme on test avec les dto, le parametre du mock et celui du service sont different, 
-        // d'ou @MockitoSettings(strictness = Strictness.LENIENT) pour pas remonter d'exception
+        /**
+         * Ici, on indique au mock de repository d'accepter en entrée n'importe quelle instance de Ville
+         * https://mkyong.com/spring-boot/spring-mockito-unable-to-mock-save-method/ 
+         */
+        when(villeRepository.save(any(Ville.class))).thenReturn(villeOut);
+        /**
+         * comme on test avec les dto, le parametre du mock et celui du service sont different (on passe d'un dto au service testé a un entity pour le repository mocké), 
+         * Mokito cree une alerte d'ou @MockitoSettings(strictness = Strictness.LENIENT) pour pas remonter d'exception et lui indiquer que le comportement est normal
+         */
         VilleDto villeDto = villeSvc.save(new VilleDto(0l, "poo", 1l));
         assertNotNull(villeDto);
         assertEquals("poo", villeDto.getNom());
