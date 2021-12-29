@@ -31,7 +31,9 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
 
     /**
-     * a l'initialisation on ajoute des User dans la Base H2 in memory crée par @DataJpaTest
+     * a l'initialisation du @Test on ajoute des Users dans la Base H2 in memory crée par @DataJpaTest
+     * ATTENTION VOIR exemple dans {@link VilleRepositoryTest} pour un @BeforeAll
+     * plus d'info ici https://www.baeldung.com/junit-before-beforeclass-beforeeach-beforeall
      */
     @BeforeEach
     void initUseCase() {
@@ -62,6 +64,10 @@ public class UserRepositoryTest {
         );
         Iterable<User> allUsers = userRepository.saveAll(users);
 
+        /**
+         * ici, on test si on a bien un id pour chaque entité persistée on incremente un compteur
+         * (pas de taitement multithread le AtomicInteger n'est pas obligatoire dans ce cas precis, mais AtomicInteger#getAndIncrement est comode)
+         */
         AtomicInteger validIdFound = new AtomicInteger();
         allUsers.forEach(customer -> {
             if(customer.getId()>0){
@@ -76,7 +82,7 @@ public class UserRepositoryTest {
      */
     @Test
     void findAll_success() {
-        Iterable<User> allUsers = userRepository.findAll();
+        Iterable<User> allUsers = userRepository.findAll();// avec une liste ca marche aussi
         assertTrue(StreamSupport.stream(allUsers.spliterator(), false).count()>=1l);
     }
     
