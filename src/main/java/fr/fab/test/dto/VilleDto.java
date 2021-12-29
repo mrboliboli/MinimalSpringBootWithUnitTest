@@ -1,7 +1,5 @@
 package fr.fab.test.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +16,6 @@ public class VilleDto {
     @NonNull
     private String nom;
     @NonNull
-    @JsonBackReference
-    private PaysDto pays;
+    private Long id_pays;
     
 }

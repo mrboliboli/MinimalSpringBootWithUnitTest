@@ -2,6 +2,7 @@ package fr.fab.test.models;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor
-public class Pays {
+public class Pays{
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

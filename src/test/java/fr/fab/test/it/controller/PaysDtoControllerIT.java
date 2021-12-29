@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
@@ -18,26 +20,22 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import fr.fab.test.dto.UserDto;
+import fr.fab.test.dto.PaysDto;
+import fr.fab.test.dto.VilleDto;
 import lombok.extern.log4j.Log4j2;
 
-/**
- * configuration de mockMvc simplifié voir documentation ici
- * https://spring.io/guides/gs/testing-web/
- * 
- * voir la pour l'utilisation de jsonPath
- * https://www.petrikainulainen.net/programming/spring-framework/integration-testing-of-spring-mvc-applications-write-clean-assertions-with-jsonpath/
- */
-@Log4j2
 @SpringBootTest
 @AutoConfigureMockMvc
+@Log4j2
 @TestPropertySource("classpath:application-test.properties")
 @DirtiesContext
-public class UserControllerIT {
+public class PaysDtoControllerIT {
+
     /**
      * Attention verifier la necessité d'ajouter le @DirtiesContext
      * car on a modifier la source de properties
      */
+
     @Autowired
     private MockMvc mockMvc;
     
@@ -51,33 +49,38 @@ public class UserControllerIT {
      */
     @Test 
     void should_create_persistant_entity_from_controller() throws Exception {
-        UserDto userDto = new UserDto("Stark", "Tony", 50, "Malibu", 'M');
-        log.debug(objectMapper.writeValueAsString(userDto));
-        mockMvc.perform(post("/user-management/user")
+        PaysDto paysDto = new PaysDto("Pooland", "pl", new ArrayList<>());
+       /*  */ VilleDto villeDto = new VilleDto("pee", 0l);
+        paysDto.getVilles().add(villeDto);
+        log.debug(objectMapper.writeValueAsString(paysDto));
+        mockMvc.perform(post("/pays-dto/country")
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(objectMapper.writeValueAsString(userDto)))
+            .content(objectMapper.writeValueAsString(paysDto)))
             .andExpect(status().isCreated());
     }
 
 
     @Test
     public void getAllEmployeesAPI() throws Exception {
-        mockMvc.perform(get("/user-management/users")
-            .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/pays-dto/countries")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$[*].id").isNotEmpty());
     }
     
+
+
+
     @Test
     public void getUsersByIdAPI() throws Exception {
-        mockMvc.perform(get("/user-management/user/{id}", 1)
-            .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/pays-dto/country/{id}", 1)
+            .accept(MediaType.APPLICATION_JSON_VALUE))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id", is(1)))
-            .andExpect(jsonPath("$.nom", is("Stark")));
+            .andExpect(jsonPath("$.nomPays", is("Pooland")));
     }
-
+    
 }

@@ -1,4 +1,4 @@
-package fr.fab.test.ut;
+package fr.fab.test.ut.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
